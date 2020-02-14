@@ -4,6 +4,13 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 from shutil import which
+from enum import Enum
+
+
+class Status(Enum):
+    AUTHORIZED = 1
+    NOTAUTHORIZED = 2
+    FAILED = 3
 
 
 class Browser():
@@ -11,6 +18,7 @@ class Browser():
 
     def __init__(self, config):
         self.config = config
+        self.authstatus = Status.NOTAUTHORIZED
 
     def login(self):
         user, pw = self.config.conf.get('credentials', 'username'), \
@@ -30,6 +38,8 @@ class Browser():
 
         driver.get(self.config.conf.get('urls', 'login'))
         die()
+
+        # TODO: check for label with recaptcha-anchor-label (google captcha)
 
         username_field = driver.find_element_by_id("inputEmail")
         username_field.clear()
@@ -65,4 +75,4 @@ class Browser():
 
         if self.config.debug:
             sleep(10)
-            driver.quit()
+        driver.quit()
